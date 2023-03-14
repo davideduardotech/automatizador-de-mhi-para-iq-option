@@ -141,7 +141,7 @@ def escolherAtivo():
         try:
             escolha = int(input("   digite sua escolha:"))
             try:
-                ATIVO = lista_de_ativos_abertos[escolha]
+                ATIVO = lista_de_ativos_abertos[escolha-1]
                 limparTerminal()
                 print("{}Login Iq Option{} Conectado, R${}({})\n".format(Fore.GREEN, Fore.RESET, api.get_balance(), "Conta de Treinamento" if TIPO_DE_CONTA == "PRACTICE" else "Conta Real"))
                 print("{}Tipo de Conta(R$){} {}(R${}) escolhilada com sucesso\n".format(Fore.GREEN, Fore.RESET,"Conta de Treinamento" if TIPO_DE_CONTA == "PRACTICE" else "Conta Real",api.get_balance()))
@@ -163,90 +163,162 @@ def mhi(estrategia, ativo, timeframe=1):
             if entrar:
                 direcao = None
                 velas = api.get_candles(ativo, timeframe*60,3,time.time())
-                velas[0] = "g" if velas[0]["open"] < velas[0]["close"] else "r" if velas[0]["open"] > velas[0]["close"] else 'd'
-                velas[1] = "g" if velas[1]["open"] < velas[1]["close"] else "r" if velas[1]["open"] > velas[1]["close"] else 'd'
-                velas[2] = "g" if velas[2]["open"] < velas[2]["close"] else "r" if velas[2]["open"] > velas[2]["close"] else 'd'
-                cores = velas[0]+" "+velas[1]+" "+velas[2]
-                if(estrategia == "MHI minoria" or estrategia == "MHI maioria"):
-                    if(estrategia == "MHI minoria"):
-                        if cores.count("r") > cores.count("g") and cores.count("d") == 0 : direcao = "CALL"
-                        if cores.count("g") > cores.count("r") and cores.count("d") == 0 : direcao = "PUT"
-                    if(estrategia == "MHI maioria"): 
-                        if cores.count("r") > cores.count("g") and cores.count("d") == 0 : direcao = "PUT"
-                        if cores.count("g") > cores.count("r") and cores.count("d") == 0 : direcao = "CALL"
-                
+                velas[0]["cor"] = "g" if velas[0]["open"] < velas[0]["close"] else "r" if velas[0]["open"] > velas[0]["close"] else 'd'
+                velas[1]["cor"] = "g" if velas[1]["open"] < velas[1]["close"] else "r" if velas[1]["open"] > velas[1]["close"] else 'd'
+                velas[2]["cor"] = "g" if velas[2]["open"] < velas[2]["close"] else "r" if velas[2]["open"] > velas[2]["close"] else 'd'
+                cores = velas[0]["cor"]+" "+velas[1]["cor"]+" "+velas[2]["cor"]
+                if cores.count('d') > 0:
+                    print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET}",f"[{Fore.RED}*{Fore.RESET}] operação cancelada,","{}({}), {}({}), {}({})".format("vermelho" if velas[0]["cor"] == "r" else "verde" if velas[0]["cor"] == "g" else "doji", datetime.fromtimestamp(velas[0]["from"]).strftime("%d/%m/%Y %H:%M:%S"), "vermelho" if velas[1]["cor"] == "r" else "verde" if velas[1]["cor"] == "g" else "doji",datetime.fromtimestamp(velas[1]["from"]).strftime("%d/%m/%Y %H:%M:%S") , "vermelho" if velas[2]["cor"] == "r" else "verde" if velas[2]["cor"] == "g" else "doji",datetime.fromtimestamp(velas[2]["from"]).strftime("%d/%m/%Y %H:%M:%S")))
+                else:
+                    print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET}",f"[{Fore.GREEN}*{Fore.RESET}] operação confirmada,","{}({}), {}({}), {}({})".format("vermelho" if velas[0]["cor"] == "r" else "verde" if velas[0]["cor"] == "g" else "doji", datetime.fromtimestamp(velas[0]["from"]).strftime("%d/%m/%Y %H:%M:%S"), "vermelho" if velas[1]["cor"] == "r" else "verde" if velas[1]["cor"] == "g" else "doji",datetime.fromtimestamp(velas[1]["from"]).strftime("%d/%m/%Y %H:%M:%S") , "vermelho" if velas[2]["cor"] == "r" else "verde" if velas[2]["cor"] == "g" else "doji",datetime.fromtimestamp(velas[2]["from"]).strftime("%d/%m/%Y %H:%M:%S")))
+                    if(estrategia == "MHI minoria" or estrategia == "MHI maioria"):
+                        if(estrategia == "MHI minoria"):
+                            if cores.count("r") > cores.count("g") and cores.count("d") == 0 : direcao = "CALL" 
+                            if cores.count("g") > cores.count("r") and cores.count("d") == 0 : direcao = "PUT"
+                        if(estrategia == "MHI maioria"): 
+                            if cores.count("r") > cores.count("g") and cores.count("d") == 0 : direcao = "PUT"
+                            if cores.count("g") > cores.count("r") and cores.count("d") == 0 : direcao = "CALL"
+                    if(estrategia == "MHI2 minoria" or estrategia == "MHI2 maioria"):
+                        if(estrategia == "MHI2 minoria"):
+                            if cores.count("r") > cores.count("g") and cores.count("d") == 0 : direcao = "CALL"
+                            if cores.count("g") > cores.count("r") and cores.count("d") == 0 : direcao = "PUT"
+                        if(estrategia == "MHI2 maioria"):
+                            if cores.count("r") > cores.count("g") and cores.count("d") == 0 : direcao = "PUT"
+                            if cores.count("g") > cores.count("r") and cores.count("d") == 0 : direcao = "CALL"
+                    if(estrategia == "MHI3 minoria" or estrategia == "MHI3 maioria"):
+                        if(estrategia == "MHI3 minoria"):
+                            if cores.count("r") > cores.count("g") and cores.count("d") == 0 : direcao = "CALL"
+                            if cores.count("g") > cores.count("r") and cores.count("d") == 0 : direcao = "PUT"
+                        if(estrategia == "MHI3 maioria"):
+                            if cores.count("r") > cores.count("g") and cores.count("d") == 0 : direcao = "PUT"
+                            if cores.count("g") > cores.count("r") and cores.count("d") == 0 : direcao = "CALL"
+                    
                 if direcao != None:
                     entrar = False
+                    print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} direção da operação confirmada: {direcao.lower()}")
                     while True:
                         if(estrategia.split(" ")[0].strip() == "MHI"):
                             time.sleep(60)
-                            vela_atual = api.get_candles(ativo, timeframe*60,1,time.time())
-                            vela_atual[0] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual[0]["cor"] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual[1]["cor"] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
+                            print("{}log da aplicação -{}".format(Fore.LIGHTBLACK_EX, Fore.RESET),"velas recebidas | 1° entrada | sem martingale \n   0. {}, open: {} close: {}, min: {}, max: {}, cor: {}\n   1. {}, open: {} close: {}, min: {}, max: {}, cor: {}".format(datetime.fromtimestamp(vela_atual[0]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[0]["open"], vela_atual[0]["close"], vela_atual[0]["min"], vela_atual[0]["max"], "vermelha" if vela_atual[0]["cor"] == "r" else "verde" if vela_atual[0]["cor"] == "g" else "doji", datetime.fromtimestamp(vela_atual[1]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[1]["open"], vela_atual[1]["close"], vela_atual[1]["min"], vela_atual[1]["max"], "vermelha" if vela_atual[1]["cor"] == "r" else "verde" if vela_atual[1]["cor"] == "g" else "doji"))
+                            
+                            vela_atual[1] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
                             #$ 1° Entrada(Sem Gale)
-                            if(vela_atual[0] == "g" and direcao == "CALL"):
+                            if(vela_atual[1] == "g" and direcao == "CALL"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela verde, operação cancelada")
+                                
                                 break
-                            if(vela_atual[0] == "r" and direcao == "PUT"):
+                            if(vela_atual[1] == "r" and direcao == "PUT"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela vermelha, operação cancelada")
+                                
                                 break
-                            if(vela_atual[0] == "d"):
+                            if(vela_atual[1] == "d"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela doji, operação cancelada")
+                                
                                 break
                             #$ 2° Entrada(1 Martingale)
                             time.sleep(60)
-                            vela_atual = api.get_candles(ativo, timeframe*60,1,time.time())
-                            vela_atual[0] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual = api.get_candles(ativo, timeframe*60,2,time.time())
+                            vela_atual[0]["cor"] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual[1]["cor"] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
+                            print("{}log da aplicação -{}".format(Fore.LIGHTBLACK_EX,Fore.RESET),"velas recebidas | 2° entrada | sem martingale \n   0. {}, open: {} close: {}, min: {}, max: {}, cor: {}\n   1. {}, open: {} close: {}, min: {}, max: {}, cor: {}".format(datetime.fromtimestamp(vela_atual[0]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[0]["open"], vela_atual[0]["close"], vela_atual[0]["min"], vela_atual[0]["max"], "vermelha" if vela_atual[0]["cor"] == "r" else "verde" if vela_atual[0]["cor"] == "g" else "doji", datetime.fromtimestamp(vela_atual[1]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[1]["open"], vela_atual[1]["close"], vela_atual[1]["min"], vela_atual[1]["max"], "vermelha" if vela_atual[1]["cor"] == "r" else "verde" if vela_atual[1]["cor"] == "g" else "doji"))
+                            
+                            vela_atual[1] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
                             #$ 1° Entrada(Sem Gale)
-                            if(vela_atual[0] == "g" and direcao == "CALL"):
+                            if(vela_atual[1] == "g" and direcao == "CALL"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela verde, operação cancelada")
+                                
                                 break
-                            if(vela_atual[0] == "r" and direcao == "PUT"):
+                            if(vela_atual[1] == "r" and direcao == "PUT"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela vermelha, operação cancelada")
+                                
                                 break
-                            if(vela_atual[0] == "d"):
+                            if(vela_atual[1] == "d"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela doji, operação cancelada")
+                                
                                 break
                             entrar = True
                             break
                         if(estrategia.split(" ")[0].strip() == "MHI2"):
                             time.sleep(120)
-                            vela_atual = api.get_candles(ativo, timeframe*60,1,time.time())
-                            vela_atual[0] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual = api.get_candles(ativo, timeframe*60,2,time.time())
+                            vela_atual[0]["cor"] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual[1]["cor"] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
+                            print("{}log da aplicação -{}".format(Fore.LIGHTBLACK_EX, Fore.RESET),"velas recebidas | 1° entrada | sem martingale \n   0. {}, open: {} close: {}, min: {}, max: {}, cor: {}\n   1. {}, open: {} close: {}, min: {}, max: {}, cor: {}".format(datetime.fromtimestamp(vela_atual[0]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[0]["open"], vela_atual[0]["close"], vela_atual[0]["min"], vela_atual[0]["max"], "vermelha" if vela_atual[0]["cor"] == "r" else "verde" if vela_atual[0]["cor"] == "g" else "doji", datetime.fromtimestamp(vela_atual[1]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[1]["open"], vela_atual[1]["close"], vela_atual[1]["min"], vela_atual[1]["max"], "vermelha" if vela_atual[1]["cor"] == "r" else "verde" if vela_atual[1]["cor"] == "g" else "doji"))
+                            vela_atual[1] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
+                            
                             #$ 1° Entrada(Sem Gale)
-                            if(vela_atual[0] == "g" and direcao == "CALL"):
+                            if(vela_atual[1] == "g" and direcao == "CALL"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela verde, operação cancelada")
+                                
                                 break
-                            if(vela_atual[0] == "r" and direcao == "PUT"):
+                            if(vela_atual[1] == "r" and direcao == "PUT"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela vermelha, operação cancelada")
+                                
                                 break
-                            if(vela_atual[0] == "d"):
+                            if(vela_atual[1] == "d"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela doji, operação cancelada")
+                                
                                 break
                             #$ 2° Entrada(1 Martingale)
                             time.sleep(60)
-                            vela_atual = api.get_candles(ativo, timeframe*60,1,time.time())
-                            vela_atual[0] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual = api.get_candles(ativo, timeframe*60,2,time.time())
+                            vela_atual[0]["cor"] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual[1]["cor"] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
+                            print("{}log da aplicação -{}".format(Fore.LIGHTBLACK_EX,Fore.RESET),"velas recebidas | 2° entrada | sem martingale \n   0. {}, open: {} close: {}, min: {}, max: {}, cor: {}\n   1. {}, open: {} close: {}, min: {}, max: {}, cor: {}".format(datetime.fromtimestamp(vela_atual[0]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[0]["open"], vela_atual[0]["close"], vela_atual[0]["min"], vela_atual[0]["max"], "vermelha" if vela_atual[0]["cor"] == "r" else "verde" if vela_atual[0]["cor"] == "g" else "doji", datetime.fromtimestamp(vela_atual[1]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[1]["open"], vela_atual[1]["close"], vela_atual[1]["min"], vela_atual[1]["max"], "vermelha" if vela_atual[1]["cor"] == "r" else "verde" if vela_atual[1]["cor"] == "g" else "doji"))
+                            
+                            vela_atual[1] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
                             #$ 1° Entrada(Sem Gale)
-                            if(vela_atual[0] == "g" and direcao == "CALL"):
+                            if(vela_atual[1] == "g" and direcao == "CALL"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela verde, operação cancelada")
+                                
                                 break
-                            if(vela_atual[0] == "r" and direcao == "PUT"):
+                            if(vela_atual[1] == "r" and direcao == "PUT"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela vermelha, operação cancelada")
+                                
                                 break
-                            if(vela_atual[0] == "d"):
+                            if(vela_atual[1] == "d"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela doji, operação cancelada")
+                                
                                 break
                             entrar = True
                             break
                         if(estrategia.split(" ")[0].strip() == "MHI3"):
                             time.sleep(180)
-                            vela_atual = api.get_candles(ativo, timeframe*60,1,time.time())
-                            vela_atual[0] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual = api.get_candles(ativo, timeframe*60,2,time.time())
+                            vela_atual[0]["cor"] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual[1]["cor"] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
+                            print("{}log da aplicação -{}".format(Fore.LIGHTBLACK_EX, Fore.RESET),"velas recebidas | 1° entrada | sem martingale \n   0. {}, open: {} close: {}, min: {}, max: {}, cor: {}\n   1. {}, open: {} close: {}, min: {}, max: {}, cor: {}".format(datetime.fromtimestamp(vela_atual[0]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[0]["open"], vela_atual[0]["close"], vela_atual[0]["min"], vela_atual[0]["max"], "vermelha" if vela_atual[0]["cor"] == "r" else "verde" if vela_atual[0]["cor"] == "g" else "doji", datetime.fromtimestamp(vela_atual[1]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[1]["open"], vela_atual[1]["close"], vela_atual[1]["min"], vela_atual[1]["max"], "vermelha" if vela_atual[1]["cor"] == "r" else "verde" if vela_atual[1]["cor"] == "g" else "doji"))
+                            
+                            vela_atual[1] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
                             #$ 1° Entrada(Sem Gale)
-                            if(vela_atual[0] == "g" and direcao == "CALL"):
+                            if(vela_atual[1] == "g" and direcao == "CALL"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela verde, operação cancelada")
                                 break
-                            if(vela_atual[0] == "r" and direcao == "PUT"):
+                            if(vela_atual[1] == "r" and direcao == "PUT"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela vermelha, operação cancelada")
                                 break
-                            if(vela_atual[0] == "d"):
+                            if(vela_atual[1] == "d"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela doji, operação cancelada")
                                 break
                             #$ 2° Entrada(1 Martingale)
                             time.sleep(60)
-                            vela_atual = api.get_candles(ativo, timeframe*60,1,time.time())
-                            vela_atual[0] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual = api.get_candles(ativo, timeframe*60,2,time.time())
+                            vela_atual[0]["cor"] = "g" if vela_atual[0]["open"] < vela_atual[0]["close"] else "r" if vela_atual[0]["open"] > vela_atual[0]["close"] else "d"
+                            vela_atual[1]["cor"] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
+                            print("{}log da aplicação -{}".format(Fore.LIGHTBLACK_EX,Fore.RESET),"velas recebidas | 2° entrada | sem martingale \n   0. {}, open: {} close: {}, min: {}, max: {}, cor: {}\n   1. {}, open: {} close: {}, min: {}, max: {}, cor: {}".format(datetime.fromtimestamp(vela_atual[0]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[0]["open"], vela_atual[0]["close"], vela_atual[0]["min"], vela_atual[0]["max"], "vermelha" if vela_atual[0]["cor"] == "r" else "verde" if vela_atual[0]["cor"] == "g" else "doji", datetime.fromtimestamp(vela_atual[1]["from"]).strftime("%d/%m/%Y %H:%M:%S"), vela_atual[1]["open"], vela_atual[1]["close"], vela_atual[1]["min"], vela_atual[1]["max"], "vermelha" if vela_atual[1]["cor"] == "r" else "verde" if vela_atual[1]["cor"] == "g" else "doji"))
+                            
+                            vela_atual[1] = "g" if vela_atual[1]["open"] < vela_atual[1]["close"] else "r" if vela_atual[1]["open"] > vela_atual[1]["close"] else "d"
                             #$ 1° Entrada(Sem Gale)
-                            if(vela_atual[0] == "g" and direcao == "CALL"):
+                            if(vela_atual[1] == "g" and direcao == "CALL"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela verde, operação cancelada")
                                 break
-                            if(vela_atual[0] == "r" and direcao == "PUT"):
+                            if(vela_atual[1] == "r" and direcao == "PUT"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela vermelha, operação cancelada")
                                 break
-                            if(vela_atual[0] == "d"):
+                            if(vela_atual[1] == "d"):
+                                print(f"{Fore.LIGHTBLACK_EX}log da aplicação -{Fore.RESET} [{Fore.RED}*{Fore.RESET}] vela doji, operação cancelada")
                                 break
                             entrar = True
                             break
@@ -255,27 +327,34 @@ def mhi(estrategia, ativo, timeframe=1):
                         if LUCRO_ATUAL < STOP_WIN and LUCRO_ATUAL > -STOP_LOSS:
                             status,id = api.buy(VALOR_DE_ENTRADA,ativo,direcao,1)
                             if(status):
-                                print("\n{}{}{} Operação Executada com R${}".format(Fore.LIGHTBLACK_EX,datetime.now().strftime("%d/%m/%Y %H:%M:%S"), Fore.RESET, VALOR_DE_ENTRADA))
+                            
+                                print("\n{}{}{}{} Operação Executada com R${}".format(Fore.LIGHTBLACK_EX,datetime.now().strftime("%d/%m/%Y %H:%M:%S"), Fore.RESET,Fore.GREEN, VALOR_DE_ENTRADA))
                                 print(f"| {ativo} {direcao} {timeframe}M")
                                 status,lucro = api.check_win_v4(id)
                                 if(status == "win"):
                                     LUCRO_ATUAL += lucro
-                                    print(f"{Fore.GREEN}[*]{Fore.RESET} Win, ganho de R${lucro:,.2f} reais | Lucro Atual: R${LUCRO_ATUAL:,.2f} reais")
+                                    print(f"{Fore.GREEN} Win, ganho de R${lucro:,.2f} reais | Lucro Atual: R${LUCRO_ATUAL:,.2f} reais\n")
                                 else:
                                     LUCRO_ATUAL -= abs(lucro)
-                                    print(f"{Fore.RED}[*]{Fore.RESET} Loss, perca de -R${abs(lucro):,.2f} reais | Lucro Atual: R${LUCRO_ATUAL:,.2f} reais")
+                                    print(f"{Fore.RED} Loss, perca de -R${abs(lucro):,.2f} reais | Lucro Atual: R${LUCRO_ATUAL:,.2f} reais\n")
                                     
                             else:
-                                print("\n{}{}{} Operação não executada com R${}".format(Fore.LIGHTBLACK_EX,datetime.now().strftime("%d/%m/%Y %H:%M:%S"), Fore.RESET, VALOR_DE_ENTRADA))
-                                print(f"| {Fore.RED}{id}")
+                                print("\n{}{}{} {}Operação não executada com R${}, ocorreu algum problema...".format(Fore.LIGHTBLACK_EX,datetime.now().strftime("%d/%m/%Y %H:%M:%S"), Fore.RESET,Fore.RED, VALOR_DE_ENTRADA))
+                                print(f"| {Fore.RED}{id}\n")
         
                         else:
                             if LUCRO_ATUAL > STOP_WIN:
                                 print(F"\nSTOP WIN ATINGIDO, LUCRO DE R${LUCRO_ATUAL:,.2f} REAIS")
+                                print(f"{Fore.LIGHTBLACK_EX}clique em qualquer tecla para fechar a aplicação")
+                                sys.exit()
                             else:
                                 print(F"\nSTOP LOSS ATINGIDO, PERCA DE -R${abs(LUCRO_ATUAL):,.2f} REAIS")
+                                print(f"{Fore.LIGHTBLACK_EX}clique em qualquer tecla para fechar a aplicação")
+                                sys.exit()
+                                
     except Exception as erro:
-        print(f"\n{Fore.RED}{erro}")                                                     
+        print(f"\n{Fore.RED}{erro}")    
+        input()                                                 
 #$ Limpar Terminal(Windows/Linux)
 limparTerminal()
 
